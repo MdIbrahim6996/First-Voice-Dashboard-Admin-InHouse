@@ -245,6 +245,7 @@ const Leads = () => {
         // CARD
         { label: "NAME ON CARD", key: "cardName" },
         { label: "CARD NUMBER", key: "cardNumber" },
+        { label: "CARD BANK NAME", key: "cardBankName" },
         { label: "CARD EXPIRY", key: "expiry" },
         { label: "CARD CVV", key: "cardCvv" },
         //

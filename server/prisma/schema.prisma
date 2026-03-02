@@ -42,6 +42,7 @@ model Process {
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  // active    Boolean  @default(true)
   Lead      Lead[]
   plans     Plan[]
   User      User[]
@@ -131,7 +132,7 @@ model Lead {
   leadByUserId       Int?
   verifierId         Int?
   paymentMethod      String?
-  comment            String?
+  comment            String?              @db.Text
   poa                Boolean              @default(false)
   Appliance          Appliance[]
   closer             User?                @relation("leadCloser", fields: [closerId], references: [id])

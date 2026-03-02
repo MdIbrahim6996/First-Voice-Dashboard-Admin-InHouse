@@ -69,11 +69,10 @@ export const loginController = async (
             //         redirectUrl: "http://localhost:4000/user",
             //     });
             // }
-            console.log(token, "token");
             return res
                 .cookie("token", token, {
                     httpOnly: true,
-                    secure: true,
+                    secure: false,
                     maxAge: 12 * 60 * 60 * 1000,
                     // maxAge: 20 * 1000,
                 })
