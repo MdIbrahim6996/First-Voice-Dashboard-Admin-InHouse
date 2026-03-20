@@ -15,6 +15,7 @@ app.use(
         origin: [
             "http://localhost:5173",
             "http://172.16.32.194:4000",
+            "http://172.16.32.194:5173",
             // "https://first-voice-dashboard-admin.onrender.com",
         ],
         credentials: true,
