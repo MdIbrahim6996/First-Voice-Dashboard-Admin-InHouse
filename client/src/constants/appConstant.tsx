@@ -216,3 +216,11 @@ export const accountantLinks = [
         icon: <BsCalendar2EventFill className="text-xl" />,
     },
 ];
+export const auditLinks = [
+    {
+        id: 1,
+        title: "Leads",
+        link: "/audit/leads",
+        icon: <MdList className="text-xl" />,
+    },
+];

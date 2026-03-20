@@ -145,7 +145,7 @@ const Leads = () => {
             }
         }
         const flat: any = {};
-        const flatStatusChangeReason: any = {};
+        let flatStatusChangeReason: any = {};
 
         applianceArray.forEach((appl: any, idx: number) => {
             const i = idx + 1;
@@ -154,15 +154,26 @@ const Leads = () => {
             flat[`age_${i}`] = appl.age;
         });
 
-        item?.StatusChangeReason.forEach((statusChange: any, idx: number) => {
-            const i = idx + 1;
-            flatStatusChangeReason[`from_${i}`] =
-                statusChange?.fromStatus?.toUpperCase();
-            flatStatusChangeReason[`to_${i}`] =
-                statusChange?.toStatus?.toUpperCase();
-            flatStatusChangeReason[`reason_${i}`] =
-                statusChange?.reason?.toUpperCase();
-        });
+        // item?.StatusChangeReason.forEach((statusChange: any, idx: number) => {
+        //     const i = idx + 1;
+        //     flatStatusChangeReason[`from_${i}`] =
+        //         statusChange?.fromStatus?.toUpperCase();
+        //     flatStatusChangeReason[`to_${i}`] =
+        //         statusChange?.toStatus?.toUpperCase();
+        //     flatStatusChangeReason[`reason_${i}`] =
+        //         statusChange?.reason?.toUpperCase();
+        // });
+
+        const latestStatus =
+            item?.StatusChangeReason?.length > 0
+                ? item.StatusChangeReason[item.StatusChangeReason.length - 1]
+                : null;
+
+        flatStatusChangeReason = {
+            from: latestStatus?.fromStatus?.toUpperCase() || "",
+            to: latestStatus?.toStatus?.toUpperCase() || "",
+            reason: latestStatus?.reason?.toUpperCase() || "",
+        };
         return {
             status: item?.status?.name?.toUpperCase(),
             saleDate: item?.saleDate?.substring(0, 10),
@@ -318,10 +329,14 @@ const Leads = () => {
             { label: `REASON ${i + 1}`, key: `statusChange.reason_${i + 1}` }
         );
     }
-
+    const statusChangeReasonHeaders_v2 = [
+        { label: "FROM STATUS", key: "statusChange.from" },
+        { label: "TO STATUS", key: "statusChange.to" },
+        { label: "REASON", key: "statusChange.reason" },
+    ];
     const newHeaders = [
         ...headers,
-        ...statusChangeReasonHeaders,
+        ...statusChangeReasonHeaders_v2,
         ...applianceHeaders,
     ];
     // console.log(newHeaders);

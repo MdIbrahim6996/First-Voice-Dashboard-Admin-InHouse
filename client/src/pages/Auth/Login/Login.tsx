@@ -37,6 +37,7 @@ const Login = () => {
                 if (data?.user?.role === "superadmin") navigate("/superadmin");
                 if (data?.user?.role === "admin") navigate("/admin");
                 if (data?.user?.role === "accountant") navigate("/accountant");
+                if (data?.user?.role === "audit") navigate("/audit");
             }
         } catch (error: unknown) {
             console.log(error);

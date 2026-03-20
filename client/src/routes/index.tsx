@@ -6,6 +6,7 @@ import { adminRoutes } from "./adminRoutes";
 import { superadminRoutes } from "./superadminRoutes";
 import Login from "../pages/Auth/Login/Login";
 import { accountantRoutes } from "./accountantRoutes";
+import { auditRoutes } from "./auditRoutes";
 
 export const router = createBrowserRouter([
     {
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
             { ...adminRoutes },
             { ...superadminRoutes },
             { ...accountantRoutes },
+            { ...auditRoutes },
         ],
     },
     {

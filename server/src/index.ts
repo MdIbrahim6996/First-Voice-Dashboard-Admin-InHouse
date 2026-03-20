@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import path from "path";
 import router from "./routes";
+import routerV2 from "./v2/routes";
 import { errorHandler, notFound } from "./middlewares/errorMiddleware";
 
 const app = express();
@@ -27,6 +28,7 @@ app.use(morgan("dev"));
 app.use(compression());
 
 app.use("/api/v1", router);
+app.use("/api/v2", routerV2);
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(path.resolve(), "../client", "dist")));

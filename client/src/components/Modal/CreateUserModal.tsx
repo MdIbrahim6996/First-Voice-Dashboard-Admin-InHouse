@@ -198,6 +198,7 @@ const CreateUserModal = ({ handleClose }: { handleClose: () => void }) => {
                             <option value="closer">CLOSER</option>
                             <option value="verifier">VERIFIER</option>
                             <option value="accountant">ACCOUNTANT</option>
+                            <option value="audit">AUDIT</option>
                         </select>
                         {errors.role && (
                             <p className="text-red-500 text-sm">

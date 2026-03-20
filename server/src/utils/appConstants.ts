@@ -513,6 +513,6 @@ export const quotesArray = [
 
 export const returnRandomQuotes = () => {
   const randomNum = Math.floor(Math.random() * quotesArray.length);
-  console.log(randomNum);
+  // console.log(randomNum);
   return quotesArray[randomNum];
 };

@@ -1,4 +1,9 @@
-import { accountantLinks, adminLinks, superAdminLinks } from "../../../constants/appConstant";
+import {
+    accountantLinks,
+    adminLinks,
+    superAdminLinks,
+    auditLinks,
+} from "../../../constants/appConstant";
 
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../../context/authContext";
@@ -102,6 +107,24 @@ const Sidebar = () => {
                     {user?.role === "accountant" && (
                         <div className="my-10 mb-14 space-y-1 h-[22.5rem] overflow-y-scroll sidebar">
                             {accountantLinks?.map((item) => (
+                                <NavLink
+                                    to={item.link}
+                                    key={item.id}
+                                    className={({ isActive }) =>
+                                        isActive
+                                            ? "cursor-pointer flex gap-2 items-center bg-white text-blue-700 font-semibold px-5 rounded-md py-1.5"
+                                            : "cursor-pointer flex gap-2 items-center hover:bg-white/80 hover:text-blue-800 hover:font-semibold hover:px-5 transition-all duration-300 rounded-md py-1.5 px-2"
+                                    }
+                                >
+                                    {item.icon}
+                                    {item.title}
+                                </NavLink>
+                            ))}
+                        </div>
+                    )}
+                    {user?.role === "audit" && (
+                        <div className="my-10 mb-14 space-y-1 h-[22.5rem] overflow-y-scroll sidebar">
+                            {auditLinks?.map((item) => (
                                 <NavLink
                                     to={item.link}
                                     key={item.id}
