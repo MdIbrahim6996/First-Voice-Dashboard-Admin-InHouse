@@ -10,18 +10,15 @@ export default function Greeting() {
                 transition={{ duration: 0.8 }}
                 className="max-w-md text-center p-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-500 shadow-xl backdrop-blur-md"
             >
-                {/* Asterisk icon */}
-                {/* <div className="text-white text-5xl mb-6">✱</div> */}
-
-                {/* Heading */}
                 <h1 className="text-3xl font-bold text-white">
                     Hello <span className="text-white">ADMIN!</span>
                     <span className="inline-block ml-2 animate-wave">👋</span>
                 </h1>
 
-                {/* Subtext */}
                 <Link to={"main-dashboard"}>
-                    <p className="text-white text-left">Go to Main Dashboard &rarr;</p>
+                    <p className="text-white text-left">
+                        Go to Main Dashboard &rarr;
+                    </p>
                 </Link>
             </motion.div>
 

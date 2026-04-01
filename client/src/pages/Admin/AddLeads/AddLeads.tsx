@@ -97,7 +97,7 @@ const AddLeads = () => {
     }, [register, unregister, paymentMethod]);
 
     const onSubmit: SubmitHandler<LeadsFormInput> = (data) => {
-        console.log(data);
+        // console.log(data);
         //@ts-ignore
         createLeadMutation(data);
     };

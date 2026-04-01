@@ -19,7 +19,7 @@ const Users = () => {
     const [name, setName] = useState<string>("");
 
     const { data: user, refetch } = useQuery({
-        queryKey: ["user"],
+        queryKey: ["user", name],
         queryFn: () => getAllUser(name),
     });
 

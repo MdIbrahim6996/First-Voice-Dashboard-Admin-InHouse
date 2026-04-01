@@ -587,6 +587,10 @@ const Leads = () => {
                                             });
                                         }}
                                         className={`${
+                                            item?.name.toLowerCase() === "leads"
+                                                ? "bg-orange-500"
+                                                : ""
+                                        } ${
                                             item?.name.toLowerCase() ===
                                             "success"
                                                 ? "bg-green-500"
@@ -793,6 +797,11 @@ const Leads = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <p
                                                         className={`${
+                                                            item?.status?.name?.toLowerCase() ===
+                                                            "leads"
+                                                                ? "bg-orange-500"
+                                                                : ""
+                                                        }${
                                                             item?.status?.name?.toLowerCase() ===
                                                             "success"
                                                                 ? "bg-green-500"

@@ -192,11 +192,12 @@ export const getEmployeeMonthlyAttendance = async (
             month = currentMonth,
             name = undefined,
         } = req.query;
-        console.log(
-            parseInt(month as string) === 11
-                ? parseInt(year as string) + 1
-                : year
-        );
+
+        // console.log(
+        //     parseInt(month as string) === 11
+        //         ? parseInt(year as string) + 1
+        //         : year
+        // );
 
         const lessThanDate = new Date(
             `${
@@ -217,7 +218,13 @@ export const getEmployeeMonthlyAttendance = async (
                     ),
                     lt: lessThanDate,
                 },
-                user: { name: name ? String(name) : Prisma.skip },
+                user: {
+                    alias: name
+                        ? {
+                              contains: String(name).toUpperCase(),
+                          }
+                        : Prisma.skip,
+                },
             },
         });
         const isLateCount = await prisma.attendance.groupBy({
@@ -232,7 +239,13 @@ export const getEmployeeMonthlyAttendance = async (
                     ),
                     lt: lessThanDate,
                 },
-                user: { name: name ? String(name) : Prisma.skip },
+                user: {
+                    alias: name
+                        ? {
+                              contains: String(name).toUpperCase(),
+                          }
+                        : Prisma.skip,
+                },
             },
         });
         const onTimeCount = await prisma.attendance.groupBy({
@@ -247,7 +260,13 @@ export const getEmployeeMonthlyAttendance = async (
                     ),
                     lt: lessThanDate,
                 },
-                user: { name: name ? String(name) : Prisma.skip },
+                user: {
+                    alias: name
+                        ? {
+                              contains: String(name).toUpperCase(),
+                          }
+                        : Prisma.skip,
+                },
             },
         });
 

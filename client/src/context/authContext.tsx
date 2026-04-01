@@ -4,6 +4,7 @@ import {
     type SetStateAction,
     type Dispatch,
 } from "react";
+import type { Role } from "../v2/types/auth.types";
 
 type UserData = {
     id: number;
@@ -11,7 +12,7 @@ type UserData = {
     alias: string;
     email: string;
     password: string;
-    role: string;
+    role: Role;
     token: string;
 } | null;
 

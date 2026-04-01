@@ -21,6 +21,7 @@ model User {
   updatedAt          DateTime             @updatedAt
   alias              String               @unique
   processId          Int?
+  teamId             Int?
   attendances        Attendance[]
   closedLeads        Lead[]               @relation("leadCloser")
   createdLeads       Lead[]               @relation("leadByUser")
@@ -28,21 +29,21 @@ model User {
   LeadCount          LeadCount[]
   Notification       Notification[]
   StatusChangeReason StatusChangeReason[]
+  managedTeam        Team?                @relation("TeamManager")
   process            Process?             @relation(fields: [processId], references: [id])
-  teamId             Int?
   Team               Team?                @relation("TeamMembers", fields: [teamId], references: [id])
 
-  managedTeam Team? @relation("TeamManager")
-
+  @@index([processId], map: "user_processId_fkey")
+  @@index([teamId], map: "user_teamId_fkey")
   @@map("user")
 }
 
 model Process {
   id        Int      @id @default(autoincrement())
   name      String   @unique
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  // active    Boolean  @default(true)
   Lead      Lead[]
   plans     Plan[]
   User      User[]
@@ -59,6 +60,7 @@ model Plan {
   Lead      Lead[]
   process   Process? @relation(fields: [processId], references: [id])
 
+  @@index([processId], map: "plan_processId_fkey")
   @@map("plan")
 }
 
@@ -80,6 +82,7 @@ model Attendance {
   dateTime DateTime @default(now())
   user     User?    @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "attendance_userId_fkey")
   @@map("attendance")
 }
 
@@ -91,24 +94,25 @@ model Appliance {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   leadId          Int?
-  Lead            Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  Lead            Lead?    @relation(fields: [leadId], references: [id])
 
+  @@index([leadId], map: "appliance_leadId_fkey")
   @@map("appliance")
 }
 
 model Lead {
   id                 Int                  @id @default(autoincrement())
-  title              String
-  firstName          String
+  title              String?
+  firstName          String?
   middleName         String?
-  lastName           String
-  centre             String
+  lastName           String?
+  centre             String?
   address            String?
   city               String?
-  pincode            String
+  pincode            String?
   password           String?
   dateOfBirth        DateTime?
-  phone              String
+  phone              String?
   processId          Int?
   planId             Int?
   closerId           Int?
@@ -133,7 +137,7 @@ model Lead {
   verifierId         Int?
   paymentMethod      String?
   comment            String?              @db.Text
-  poa                Boolean              @default(false)
+  poa                Boolean?             @default(false)
   Appliance          Appliance[]
   closer             User?                @relation("leadCloser", fields: [closerId], references: [id])
   leadBy             User?                @relation("leadByUser", fields: [leadByUserId], references: [id])
@@ -143,6 +147,12 @@ model Lead {
   verifier           User?                @relation("leadVerifier", fields: [verifierId], references: [id])
   StatusChangeReason StatusChangeReason[]
 
+  @@index([closerId], map: "lead_closerId_fkey")
+  @@index([leadByUserId], map: "lead_leadByUserId_fkey")
+  @@index([planId], map: "lead_planId_fkey")
+  @@index([processId], map: "lead_processId_fkey")
+  @@index([statusId], map: "lead_statusId_fkey")
+  @@index([verifierId], map: "lead_verifierId_fkey")
   @@map("lead")
 }
 
@@ -167,6 +177,7 @@ model Notification {
   updatedAt DateTime @updatedAt
   user      User?    @relation(fields: [userId], references: [id])
 
+  @@index([userId], map: "notification_userId_fkey")
   @@map("notification")
 }
 
@@ -182,6 +193,7 @@ model LeadCount {
   user      User?    @relation(fields: [userId], references: [id])
 
   @@unique([date, month, year, userId], name: "uniqueDate")
+  @@index([userId], map: "leadcount_userId_fkey")
   @@map("leadcount")
 }
 
@@ -197,50 +209,48 @@ model StatusChangeReason {
   lead       Lead?    @relation(fields: [leadId], references: [id])
   user       User?    @relation(fields: [userId], references: [id])
 
+  @@index([leadId], map: "status_change_reason_leadId_fkey")
+  @@index([userId], map: "status_change_reason_userId_fkey")
   @@map("status_change_reason")
 }
 
 model Team {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-
-  managerId Int?  @unique
-  manager   User? @relation("TeamManager", fields: [managerId], references: [id])
-
-  members User[] @relation("TeamMembers")
-
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  managerId Int?     @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  manager   User?    @relation("TeamManager", fields: [managerId], references: [id])
+  members   User[]   @relation("TeamMembers")
 
   @@map("team")
 }
 
 model old_users {
-  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  id                BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
   employee_id       String?
-  name              String    @db.VarChar(150)
-  email             String?   @db.VarChar(100)
-  email_verified_at DateTime? @db.Timestamp(0)
-  email_otp         String?   @db.VarChar(10)
-  designation       String?   @db.VarChar(150)
-  gender            String?   @db.VarChar(20)
-  address           String?   @db.VarChar(300)
-  city              String?   @db.VarChar(100)
-  state             String?   @db.VarChar(100)
-  pin               String?   @db.VarChar(20)
-  pan               String?   @db.VarChar(20)
+  name              String      @db.VarChar(150)
+  email             String?     @db.VarChar(100)
+  email_verified_at DateTime?   @db.Timestamp(0)
+  email_otp         String?     @db.VarChar(10)
+  designation       String?     @db.VarChar(150)
+  gender            String?     @db.VarChar(20)
+  address           String?     @db.VarChar(300)
+  city              String?     @db.VarChar(100)
+  state             String?     @db.VarChar(100)
+  pin               String?     @db.VarChar(20)
+  pan               String?     @db.VarChar(20)
   pic               String?
   password          String
-  role              String    @default("Superadmin") @db.VarChar(30)
-  phone             String?   @db.VarChar(20)
-  join_at           DateTime? @db.Date
-  active            Boolean   @default(true)
-  remember_token    String?   @db.VarChar(100)
-  created_at        DateTime? @db.Timestamp(0)
-  updated_at        DateTime? @db.Timestamp(0)
-
-  leads_created old_leads[] @relation("old_leads_user_idToold_users")
-  leads_closed  old_leads[] @relation("old_leads_closer_user_idToold_users")
+  role              String      @default("Superadmin") @db.VarChar(30)
+  phone             String?     @db.VarChar(20)
+  join_at           DateTime?   @db.Date
+  active            Boolean     @default(true)
+  remember_token    String?     @db.VarChar(100)
+  created_at        DateTime?   @db.Timestamp(0)
+  updated_at        DateTime?   @db.Timestamp(0)
+  leads_closed      old_leads[] @relation("old_leads_closer_user_idToold_users")
+  leads_created     old_leads[] @relation("old_leads_user_idToold_users")
 
   @@index([email], map: "users_email_index")
   @@index([phone], map: "users_phone_index")
@@ -248,20 +258,20 @@ model old_users {
 }
 
 model old_leads {
-  id             BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  user_id        BigInt    @db.UnsignedBigInt
-  sale_at        DateTime? @db.Date
-  salutation     String?   @db.VarChar(20)
-  closer_user_id BigInt?   @db.UnsignedBigInt
+  id             BigInt     @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id        BigInt     @db.UnsignedBigInt
+  sale_at        DateTime?  @db.Date
+  salutation     String?    @db.VarChar(20)
+  closer_user_id BigInt?    @db.UnsignedBigInt
   fname          String
   mname          String?
   lname          String?
-  address1       String?   @db.MediumText
+  address1       String?    @db.MediumText
   city           String?
   country        String?
   pin            String?
   password       String?
-  dob            DateTime? @db.Date
+  dob            DateTime?  @db.Date
   phone          String?
   process        String?
   plan           String?
@@ -275,16 +285,13 @@ model old_leads {
   card_type      String?
   expiry_month   Int?
   expiry_year    Int?
-  card_cvv       String?   @db.VarChar(10)
-  comments       String?   @db.Text
-  centre         String?   @db.VarChar(255)
-  created_at     DateTime? @db.Timestamp(0)
-  updated_at     DateTime? @db.Timestamp(0)
-  // old_users_old_leads_closer_user_idToold_users old_users? @relation("old_leads_closer_user_idToold_users", fields: [closer_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "leads_closer_user_id_foreign")
-  // old_users_old_leads_user_idToold_users        old_users  @relation("old_leads_user_idToold_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "leads_user_id_foreign")
-
-  closer old_users? @relation("old_leads_closer_user_idToold_users", fields: [closer_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "leads_closer_user_id_foreign")
-  user   old_users  @relation("old_leads_user_idToold_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "leads_user_id_foreign")
+  card_cvv       String?    @db.VarChar(10)
+  comments       String?    @db.Text
+  centre         String?    @db.VarChar(255)
+  created_at     DateTime?  @db.Timestamp(0)
+  updated_at     DateTime?  @db.Timestamp(0)
+  closer         old_users? @relation("old_leads_closer_user_idToold_users", fields: [closer_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "leads_closer_user_id_foreign")
+  user           old_users  @relation("old_leads_user_idToold_users", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "leads_user_id_foreign")
 
   @@index([closer_user_id], map: "leads_closer_user_id_foreign")
   @@index([user_id], map: "leads_user_id_foreign")

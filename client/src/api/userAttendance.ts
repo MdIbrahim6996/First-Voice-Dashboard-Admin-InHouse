@@ -9,6 +9,7 @@ export const getEmployeeMonthlyAttendance = async (
     month: number,
     name: string | undefined
 ) => {
+    console.log(name)
     try {
         const url = name
             ? `${SERVER_URL}/superadmin/attendance/monthly?year=${year}&month=${month}&name=${name}`
