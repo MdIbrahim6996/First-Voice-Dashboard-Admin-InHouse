@@ -1,4 +1,4 @@
-import { MdAdd, MdDelete, MdRemoveRedEye } from "react-icons/md";
+import { MdAdd, MdDelete, MdEdit, MdRemoveRedEye } from "react-icons/md";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -6,14 +6,17 @@ import CreateProcessModal from "../../components/Modal/Process/Create";
 import DeleteModal from "../../components/Modal/DeleteModal/DeleteModal";
 import ProcessInfoModal from "../../components/Modal/Process/Info";
 import { deleteProcess, getAllProcess } from "../../../api/process";
+import EditProcessModal from "../../components/Modal/Process/Edit";
 
 const Process = () => {
     const [show, setShow] = useState({
         create: false,
         delete: false,
         info: false,
+        edit: false,
     });
     const [id, setId] = useState<number>();
+    const [details, setDetails] = useState({});
     const queryClient = useQueryClient();
 
     const { data: process } = useQuery({
@@ -54,6 +57,7 @@ const Process = () => {
                                         create: true,
                                         delete: false,
                                         info: false,
+                                        edit: false,
                                     })
                                 }
                                 className="py-1.5 px-7 bg-blue-700 text-white rounded-md text-sm flex gap-1 items-center"
@@ -79,6 +83,9 @@ const Process = () => {
                                     </th>
                                     <th scope="col" className="px-6 py-3">
                                         Plan
+                                    </th>
+                                    <th scope="col" className="px-6 py-3">
+                                        Status
                                     </th>
                                     <th scope="col" className="px-6 py-3">
                                         Actions
@@ -109,7 +116,33 @@ const Process = () => {
                                                 )
                                             )}
                                         </td>
+                                        <td className="px-6 py-4">
+                                            {item?.isActive ? (
+                                                <span className="text-xs bg-green-500 text-white px-3 py-0.5 rounded-md">
+                                                    ACTIVE
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs bg-red-500 text-white px-3 py-0.5 rounded-md">
+                                                    INACTIVE
+                                                </span>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 flex gap-1 items-center justify-center">
+                                            <button
+                                                onClick={() => {
+                                                    setId(item.id);
+                                                    setDetails(item);
+                                                    setShow({
+                                                        create: false,
+                                                        delete: false,
+                                                        info: false,
+                                                        edit: true,
+                                                    });
+                                                }}
+                                                className="font-medium cursor-pointer text-white bg-blue-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
+                                            >
+                                                <MdEdit />
+                                            </button>
                                             <button
                                                 onClick={() => {
                                                     setId(item.id);
@@ -117,9 +150,10 @@ const Process = () => {
                                                         create: false,
                                                         delete: false,
                                                         info: true,
+                                                        edit: false,
                                                     });
                                                 }}
-                                                className="font-medium text-white bg-green-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
+                                                className="font-medium cursor-pointer text-white bg-green-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
                                             >
                                                 <MdRemoveRedEye />
                                             </button>
@@ -130,9 +164,10 @@ const Process = () => {
                                                         create: false,
                                                         delete: true,
                                                         info: false,
+                                                        edit: false,
                                                     });
                                                 }}
-                                                className="font-medium text-white bg-red-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
+                                                className="font-medium cursor-pointer text-white bg-red-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
                                             >
                                                 <MdDelete />
                                             </button>
@@ -148,14 +183,37 @@ const Process = () => {
             {show.create && (
                 <CreateProcessModal
                     handleClose={() =>
-                        setShow({ create: false, delete: false, info: false })
+                        setShow({
+                            create: false,
+                            delete: false,
+                            info: false,
+                            edit: false,
+                        })
+                    }
+                />
+            )}
+            {show.edit && (
+                <EditProcessModal
+                    details={details}
+                    handleClose={() =>
+                        setShow({
+                            create: false,
+                            delete: false,
+                            info: false,
+                            edit: false,
+                        })
                     }
                 />
             )}
             {show.info && (
                 <ProcessInfoModal
                     handleClose={() =>
-                        setShow({ create: false, delete: false, info: false })
+                        setShow({
+                            create: false,
+                            delete: false,
+                            info: false,
+                            edit: false,
+                        })
                     }
                     id={id!}
                 />
@@ -163,7 +221,12 @@ const Process = () => {
             {show.delete && (
                 <DeleteModal
                     handleClose={() =>
-                        setShow({ create: false, delete: false, info: false })
+                        setShow({
+                            create: false,
+                            delete: false,
+                            info: false,
+                            edit: false,
+                        })
                     }
                     handleDelete={() => mutation.mutate(id!)}
                 />

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "motion/react";
-import { getTopSellers } from "../../../../api/mainDashboard";
+import { getTopSellers } from "../../../api/mainDashboard";
 import Loader from "../../../../components/Loader/Loader";
 
 const TopPerformer = () => {
@@ -9,8 +9,7 @@ const TopPerformer = () => {
         queryFn: getTopSellers,
     });
 
-    const topThree = data?.slice(0, 3);
-
+    const topThree = data?.data?.slice(0, 3);
     return (
         <div className="p-5">
             <div className="mb-5  text-gray-900 bg-white ">
@@ -44,20 +43,17 @@ const TopPerformer = () => {
                 <Loader />
             ) : (
                 <div className="grid grid-cols-3 gap-5 mt-10 w-[80%] mx-auto">
-                    {topThree.map((item: any, index: number) => {
-                        const isFirst = index === 1;
-                        const delay = 0.25 + index * 0.25;
-
-                        return (
+                    {topThree.length > 0 && (
+                        <>
                             <motion.article
-                                key={item?.user?.id || index}
                                 initial={{ opacity: 0, y: 50 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay }}
-                                className={`bg-blue-700 p-5 h-fit rounded-md text-white text-center ${
-                                    !isFirst ? "mt-20" : ""
-                                }`}
+                                transition={{ duration: 0.5, delay: 0.5 }}
+                                className="relative bg-blue-700 mt-20 p-5 h-fit rounded-md text-white text-center"
                             >
+                                <span className="absolute top-2 left-4 text-2xl font-medium">
+                                    2 <sup className="text-x">nd</sup>
+                                </span>
                                 <img
                                     src="/trophy-1.svg"
                                     alt="trophy"
@@ -65,14 +61,58 @@ const TopPerformer = () => {
                                 />
 
                                 <p className="text-3xl font-bold uppercase">
-                                    {item?.user?.alias || "—"}
+                                    {topThree[1]?.agent || "—"}
                                 </p>
                                 <p className="text-5xl font-bold uppercase mt-5">
-                                    {item?.count ?? 0} sales
+                                    {topThree[1]?.count || "—"} sales
                                 </p>
                             </motion.article>
-                        );
-                    })}
+                            <motion.article
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 1 }}
+                                className="relative bg-blue-700 p-5 h-fit rounded-md text-white text-center"
+                            >
+                                <span className="absolute top-2 left-4 text-2xl font-medium">
+                                    1 <sup className="text-x">st</sup>
+                                </span>
+                                <img
+                                    src="/trophy-1.svg"
+                                    alt="trophy"
+                                    className="mx-auto mb-5"
+                                />
+
+                                <p className="text-3xl font-bold uppercase">
+                                    {topThree[0]?.agent || "—"}
+                                </p>
+                                <p className="text-5xl font-bold uppercase mt-5">
+                                    {topThree[0]?.count || "—"} sales
+                                </p>
+                            </motion.article>
+                            <motion.article
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 1.5 }}
+                                className="relative bg-blue-700 mt-20 p-5 h-fit rounded-md text-white text-center"
+                            >
+                                <span className="absolute top-2 left-4 text-2xl font-medium">
+                                    3 <sup className="text-x">rd</sup>
+                                </span>
+                                <img
+                                    src="/trophy-1.svg"
+                                    alt="trophy"
+                                    className="mx-auto mb-5"
+                                />
+
+                                <p className="text-3xl font-bold uppercase">
+                                    {topThree[2]?.agent || "—"}
+                                </p>
+                                <p className="text-5xl font-bold uppercase mt-5">
+                                    {topThree[2]?.count || "—"} sales
+                                </p>
+                            </motion.article>
+                        </>
+                    )}
                 </div>
             )}
         </div>

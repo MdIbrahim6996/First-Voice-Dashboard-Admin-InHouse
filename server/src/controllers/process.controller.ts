@@ -162,6 +162,27 @@ export const getProcessInfo = async (
         next(error);
     }
 };
+
+export const updateProcess = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { name, isActive } = req.body;
+        const { id } = req.params;
+        console.log(req.body);
+
+        const process = await prisma.process.update({
+            where: { id: parseInt(id) },
+            data: { name, isActive },
+        });
+        res.send(process);
+    } catch (error) {
+        console.log(error);
+        next(error);
+    }
+};
 export const deleteProcess = async (
     req: Request,
     res: Response,

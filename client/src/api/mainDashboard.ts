@@ -44,3 +44,18 @@ export const getDailySales = async () => {
         return error;
     }
 };
+
+export const getProcessLeaderboardData = async () => {
+    try {
+        const { data } = await axiosInstance.get(
+            `v2/main-dashboard/leaderboard`
+        );
+        return data;
+    } catch (error) {
+        console.log(error);
+        if (axios.isAxiosError(error)) {
+            toast.error(error?.response?.data?.message);
+        }
+        return error;
+    }
+};

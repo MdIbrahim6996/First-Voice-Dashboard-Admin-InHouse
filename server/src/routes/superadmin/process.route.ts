@@ -6,6 +6,7 @@ import {
     getAllProcess,
     getProcessInfo,
     queryProcess,
+    updateProcess,
 } from "../../controllers/process.controller";
 
 const router = Router();
@@ -13,7 +14,8 @@ const router = Router();
 router.post("/", createProcess);
 router.get("/", getAllProcess);
 router.get("/:id", getProcessInfo);
-router.put("/:id", queryProcess);
+router.put("/:id", updateProcess);
+// router.put("/:id", queryProcess);
 router.delete("/:id", deleteProcess);
 
 export default router;

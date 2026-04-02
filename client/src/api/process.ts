@@ -22,6 +22,24 @@ export const createProcess = async (formData: any) => {
         return error;
     }
 };
+export const editProcess = async (formData: any) => {
+    try {
+        const { data } = await axiosInstance.put(
+            `${SERVER_URL}/superadmin/process/${formData?.id}`,
+            {
+                ...formData,
+            }
+        );
+        return data;
+    } catch (error) {
+        console.log(error);
+        if (axios.isAxiosError(error)) {
+            toast.error(error?.response?.data?.message);
+        }
+
+        return error;
+    }
+};
 
 // COMMON
 export const getAllProcess = async () => {

@@ -1,15 +1,15 @@
-const ProcessLeaderboard = ({ details, sales }: { details: any; sales: any }) => {
-    const data = sales[details?.id];
-
-    const first = data?.firstHalf;
-    const second = data?.secondHalf;
-    const third = data?.thirdHalf;
+const ProcessLeaderboard = ({ details }: { details: any }) => {
+    const first = details?.leads?.filter((item: any) => item.shift === "first");
+    const second = details?.leads?.filter(
+        (item: any) => item.shift === "second"
+    );
+    const third = details?.leads?.filter((item: any) => item.shift === "third");
 
     return (
         <div className="p-5 overflow-y-scrol">
             <div className="mb-5 text-gray-900 bg-white ">
                 <p className="text-3xl font-semibold uppercase text-center">
-                    {details?.name}
+                    {details?.process?.name}
                 </p>
             </div>
             <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
