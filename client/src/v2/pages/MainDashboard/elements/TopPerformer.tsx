@@ -43,75 +43,79 @@ const TopPerformer = () => {
                 <Loader />
             ) : (
                 <div className="grid grid-cols-3 gap-5 mt-10 w-[80%] mx-auto">
+                    {topThree.length > 1 && (
+                        <motion.article
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.5 }}
+                            className="relative bg-blue-700 mt-20 p-5 h-fit rounded-md text-white text-center"
+                        >
+                            <span className="absolute top-2 left-4 text-2xl font-medium">
+                                2 <sup className="text-x">nd</sup>
+                            </span>
+                            <img
+                                src="/trophy-1.svg"
+                                alt="trophy"
+                                className="mx-auto mb-5"
+                            />
+
+                            <p className="text-3xl font-bold uppercase">
+                                {topThree[1]?.agent || "—"}
+                            </p>
+                            <p className="text-5xl font-bold uppercase mt-5">
+                                {topThree[1]?.count || "—"} sales
+                            </p>
+                        </motion.article>
+                    )}
+
                     {topThree.length > 0 && (
-                        <>
-                            <motion.article
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.5 }}
-                                className="relative bg-blue-700 mt-20 p-5 h-fit rounded-md text-white text-center"
-                            >
-                                <span className="absolute top-2 left-4 text-2xl font-medium">
-                                    2 <sup className="text-x">nd</sup>
-                                </span>
-                                <img
-                                    src="/trophy-1.svg"
-                                    alt="trophy"
-                                    className="mx-auto mb-5"
-                                />
+                        <motion.article
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 1 }}
+                            className="relative bg-blue-700 p-5 h-fit rounded-md text-white text-center"
+                        >
+                            <span className="absolute top-2 left-4 text-2xl font-medium">
+                                1 <sup className="text-x">st</sup>
+                            </span>
+                            <img
+                                src="/trophy-1.svg"
+                                alt="trophy"
+                                className="mx-auto mb-5"
+                            />
 
-                                <p className="text-3xl font-bold uppercase">
-                                    {topThree[1]?.agent || "—"}
-                                </p>
-                                <p className="text-5xl font-bold uppercase mt-5">
-                                    {topThree[1]?.count || "—"} sales
-                                </p>
-                            </motion.article>
-                            <motion.article
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 1 }}
-                                className="relative bg-blue-700 p-5 h-fit rounded-md text-white text-center"
-                            >
-                                <span className="absolute top-2 left-4 text-2xl font-medium">
-                                    1 <sup className="text-x">st</sup>
-                                </span>
-                                <img
-                                    src="/trophy-1.svg"
-                                    alt="trophy"
-                                    className="mx-auto mb-5"
-                                />
+                            <p className="text-3xl font-bold uppercase">
+                                {topThree[0]?.agent || "—"}
+                            </p>
+                            <p className="text-5xl font-bold uppercase mt-5">
+                                {topThree[0]?.count || "—"} sales
+                            </p>
+                        </motion.article>
+                    )}
 
-                                <p className="text-3xl font-bold uppercase">
-                                    {topThree[0]?.agent || "—"}
-                                </p>
-                                <p className="text-5xl font-bold uppercase mt-5">
-                                    {topThree[0]?.count || "—"} sales
-                                </p>
-                            </motion.article>
-                            <motion.article
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 1.5 }}
-                                className="relative bg-blue-700 mt-20 p-5 h-fit rounded-md text-white text-center"
-                            >
-                                <span className="absolute top-2 left-4 text-2xl font-medium">
-                                    3 <sup className="text-x">rd</sup>
-                                </span>
-                                <img
-                                    src="/trophy-1.svg"
-                                    alt="trophy"
-                                    className="mx-auto mb-5"
-                                />
+                    {topThree.length > 2 && (
+                        <motion.article
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 1.5 }}
+                            className="relative bg-blue-700 mt-20 p-5 h-fit rounded-md text-white text-center"
+                        >
+                            <span className="absolute top-2 left-4 text-2xl font-medium">
+                                3 <sup className="text-x">rd</sup>
+                            </span>
+                            <img
+                                src="/trophy-1.svg"
+                                alt="trophy"
+                                className="mx-auto mb-5"
+                            />
 
-                                <p className="text-3xl font-bold uppercase">
-                                    {topThree[2]?.agent || "—"}
-                                </p>
-                                <p className="text-5xl font-bold uppercase mt-5">
-                                    {topThree[2]?.count || "—"} sales
-                                </p>
-                            </motion.article>
-                        </>
+                            <p className="text-3xl font-bold uppercase">
+                                {topThree[2]?.agent || "—"}
+                            </p>
+                            <p className="text-5xl font-bold uppercase mt-5">
+                                {topThree[2]?.count || "—"} sales
+                            </p>
+                        </motion.article>
                     )}
                 </div>
             )}
