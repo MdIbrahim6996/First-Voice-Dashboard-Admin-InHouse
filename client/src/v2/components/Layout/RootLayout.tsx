@@ -5,7 +5,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { axiosInstance } from "../../../lib/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 import FallbackRenderer from "../../../components/Shared/FallbackRenderer/FallbackRenderer";
-import Sidebar from "../Sidebar/Sidebar";
+import SidebarNoSlide from "../Sidebar/SidebarNoSlide";
 
 const RootLayout = () => {
     const { user, setUser } = useContext(AuthContext);
@@ -72,9 +72,9 @@ const RootLayout = () => {
             <ErrorBoundary FallbackComponent={() => <FallbackRenderer />}>
                 {user && (
                     <div className="bg-blue-700 h-screen max-w-screen flex gap-3">
-                        <div className="w-[5rem] hover:w-[20rem] transition-all duration-500 sidebar">
-                        {/* <div className="max-w-[17rem] sidebar"> */}
-                            <Sidebar />
+                        {/* <div className="w-[5rem] hover:w-[20rem] transition-all duration-500 sidebar"> */}
+                        <div className="w-[20rem] sidebar">
+                            <SidebarNoSlide />
                         </div>
                         <div className="w-full m-2 rounded-xl bg-white overflow-scroll sidebar">
                             <Outlet />
