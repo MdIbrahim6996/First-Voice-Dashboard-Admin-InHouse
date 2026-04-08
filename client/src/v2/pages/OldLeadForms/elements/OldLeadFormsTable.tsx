@@ -92,6 +92,7 @@ const OldLeadFormsTable = ({
                             {leads?.map((item: any, i: number) => (
                                 <tr
                                     key={item?.id}
+                                    // key={item?.phone + item?.sale_date}
                                     className={`text-slate-800 text-sm font-semibold uppercase border-b :border-gray-700 border-gray-200`}
                                 >
                                     <th
@@ -104,6 +105,7 @@ const OldLeadFormsTable = ({
                                     <td className="flex justify-center py-4">
                                         <button
                                             onClick={() => {
+                                                console.log("click");
                                                 setInfo({
                                                     detail: item,
                                                     show: true,

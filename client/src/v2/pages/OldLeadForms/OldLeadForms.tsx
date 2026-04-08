@@ -109,6 +109,8 @@ const OldLeadForms = () => {
         { label: "COMMENT", key: "comments" },
     ];
 
+    console.log(show.view);
+
     return (
         <>
             <div className="overflow-hidden">
@@ -139,11 +141,12 @@ const OldLeadForms = () => {
                 </div>
             </div>
 
-            {show.view && (
+            {info.show && (
                 <OldLeadFormDetailModal
-                    handleClose={() =>
-                        setShow({ edit: false, view: false, delete: false })
-                    }
+                    handleClose={() => {
+                        setShow({ edit: false, view: false, delete: false });
+                        setInfo({ show: false, detail: {} });
+                    }}
                     details={info.detail}
                 />
             )}

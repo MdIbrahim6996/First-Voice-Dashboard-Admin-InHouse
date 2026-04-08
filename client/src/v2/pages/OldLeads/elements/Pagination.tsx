@@ -65,12 +65,15 @@ const Pagination = ({
 
                         return pages.map((p, idx) =>
                             p === "..." ? (
-                                <span key={idx} className="px-3 py-1">
+                                <span
+                                    key={`ellipsis-${idx}`}
+                                    className="px-3 py-1"
+                                >
                                     ...
                                 </span>
                             ) : (
                                 <button
-                                    key={p}
+                                    key={`page-${p}`}
                                     onClick={() =>
                                         setFilters((prev) => ({
                                             ...prev,

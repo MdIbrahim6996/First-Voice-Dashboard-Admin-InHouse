@@ -70,10 +70,13 @@ export const rolePermissions: Record<Role, Permission[]> = {
         "view:leads",
         "create:leads",
         "edit:leads",
+        "delete:leads",
         "view:old_leads",
         "view:old_leadforms",
         "view:closers",
         "view:users",
+        "create:users",
+        "edit:users",
         "view:old_users",
         "view:process",
         "view:plan",
@@ -82,7 +85,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
         "view:monthly_attendance",
         "view:teams",
     ],
-    accountant: ["view:all_attendance"],
+    accountant: ["view:all_attendance", "view:users"],
     audit: ["view:leads"],
 };
 
@@ -185,7 +188,6 @@ export const sidebarItems = [
         link: "/v2/monthly-attendance",
         icon: <BsCalendar2EventFill className="text-xl" />,
     },
-    
 ];
 
 export const adminLinks = [

@@ -32,6 +32,7 @@ model User {
   managedTeam        Team?                @relation("TeamManager")
   process            Process?             @relation(fields: [processId], references: [id])
   Team               Team?                @relation("TeamMembers", fields: [teamId], references: [id])
+  Target             Target[]
 
   @@index([processId], map: "user_processId_fkey")
   @@index([teamId], map: "user_teamId_fkey")
@@ -224,6 +225,20 @@ model Team {
   members   User[]   @relation("TeamMembers")
 
   @@map("team")
+}
+
+model Target {
+  id        Int      @id @default(autoincrement())
+  value     Int      @default(0)
+  month     String   @default("")
+  year      Int
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, month, year])
+  @@map("target")
 }
 
 model old_users {

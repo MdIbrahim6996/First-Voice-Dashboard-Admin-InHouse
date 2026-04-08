@@ -7,7 +7,7 @@ import { sidebarItems } from "../../constants/appConstant";
 import { hasPermission } from "../../utils/permissions";
 import { MdOutlinePowerSettingsNew } from "react-icons/md";
 
-const Sidebar = () => {
+const SidebarNoSlide = () => {
     const { user, setUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -95,4 +95,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default SidebarNoSlide;

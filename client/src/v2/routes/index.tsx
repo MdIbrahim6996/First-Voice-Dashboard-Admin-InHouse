@@ -44,7 +44,7 @@ export const router = createBrowserRouter([
                 path: "leads",
                 async lazy() {
                     let UserLeads = await import(
-                        "../../pages/Admin/Leads/Leads"
+                        "../pages/Leads/Leads"
                     );
                     return { Component: UserLeads.default };
                 },

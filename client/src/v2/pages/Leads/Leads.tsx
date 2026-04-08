@@ -3,16 +3,19 @@ import { FaEye, FaFileCsv } from "react-icons/fa";
 import { motion } from "motion/react";
 import { CSVLink } from "react-csv";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAllStatus } from "../../api/status";
-import { deleteLead, getAllLead } from "../../api/lead";
-import { getAllProcess } from "../../api/process";
+import { getAllStatus } from "../../../api/status";
+import { deleteLead, getAllLead } from "../../../api/lead";
+import { getAllProcess } from "../../../api/process";
 import { useEffect, useRef, useState } from "react";
-import { getAllUser } from "../../api/user";
-import DeleteModal from "../../components/Modal/DeleteModal";
-import EditLeadModal from "../../components/Modal/EditLeadModal";
-import LeadDetailModal from "../../components/Modal/LeadDetailModal";
-import Loader from "../../components/Loader/Loader";
-import EmptyState from "../../components/EmptyState/EmptyState";
+import { getAllUser } from "../../../api/user";
+import DeleteModal from "../../../components/Modal/DeleteModal";
+import EditLeadModal from "../../../components/Modal/EditLeadModal";
+import LeadDetailModal from "../../../components/Modal/LeadDetailModal";
+import Loader from "../../../components/Loader/Loader";
+import EmptyState from "../../../components/EmptyState/EmptyState";
+import { getAppliancePerPage } from "../../../api/appliance";
+import { limitArray } from "../../../constants/appConstant";
+import { usePermission } from "../../hooks/usePermission";
 
 const Leads = () => {
     const [phone, setPhone] = useState("");
@@ -31,6 +34,8 @@ const Leads = () => {
     const topScrollRef = useRef<HTMLDivElement | null>(null);
     const bottomScrollRef = useRef<HTMLDivElement | null>(null);
     const tableRef = useRef<HTMLTableElement | null>(null);
+
+    const { can } = usePermission();
 
     useEffect(() => {
         const top = topScrollRef.current;
@@ -57,7 +62,7 @@ const Leads = () => {
     });
 
     const [page, setPage] = useState(1);
-    const limit = 30;
+    const [limit, setLimit] = useState(30);
 
     const queryClient = useQueryClient();
 
@@ -102,10 +107,10 @@ const Leads = () => {
 
     const leads = data?.leads;
 
-    const pagesArray = Array.from(
-        { length: data?.totalPages },
-        (_, i) => i + 1
-    );
+    // const pagesArray = Array.from(
+    //     { length: data?.totalPages },
+    //     (_, i) => i + 1
+    // );
 
     const { mutate } = useMutation({
         mutationFn: (id: number) => deleteLead(id),
@@ -114,43 +119,113 @@ const Leads = () => {
         },
     });
 
-    const excelLeadsData = leads?.map((item: any) => ({
-        status: item?.status?.name?.toUpperCase(),
-        saleDate: item?.saleDate?.substring(0, 10),
-        leadBy: item?.leadBy?.alias?.toUpperCase(),
-        closer: item?.closer?.alias?.toUpperCase(),
-        centre: item?.centre?.toUpperCase(),
-        // PERSONAL
-        title: item?.title?.toUpperCase(),
-        firstName: item?.firstName?.toUpperCase(),
-        middleName: item?.middleName?.toUpperCase(),
-        lastName: item?.lastName?.toUpperCase(),
-        address: item?.address,
-        city: item?.city?.toUpperCase(),
-        county: item?.county?.toUpperCase(),
-        post: item?.pincode,
-        dateOfBirth: item?.dateOfBirth?.substring(0, 10),
-        password: item?.password,
-        phone: item?.phone?.toString(),
-        // PROCESS / PLAN
-        process: item?.process?.name?.toUpperCase(),
-        plan: item?.plan?.name?.toUpperCase(),
-        // BANK
-        paymentMethod: item?.paymentMethod?.toUpperCase(),
-        bankName: item?.bankName?.toUpperCase(),
-        accountName: item?.accountName?.toUpperCase(),
-        accountNumber: item?.accountNumber?.toUpperCase(),
-        sort: item?.sort?.toUpperCase(),
-        // CARD
-        cardName: item?.cardName?.toUpperCase(),
-        cardBankName: item?.cardBankName?.toUpperCase(),
-        cardNumber: item?.cardNumber,
-        cardCvv: item?.cardCvv,
-        expiry: item?.expiry,
-        comment: item?.comment,
-    }));
     // console.log(leads);
     // console.log(excelLeadsData);
+
+    const leadIds = leads?.map((item: any) => item?.id) ?? [];
+
+    const { data: allApplainces } = useQuery({
+        queryKey: ["allAppliances", page, leads], //fetches appliances when page or leads array changes.
+        queryFn: () => getAppliancePerPage(leadIds),
+        enabled: leadIds?.length > 0, // 🔑 this prevents early fetch
+    });
+
+    const maxStatusChanges =
+        leads && leads.length > 0
+            ? Math.max(
+                  ...leads.map(
+                      (lead: any) => lead.StatusChangeReason?.length || 0
+                  )
+              )
+            : 0;
+
+    const newLeads = leads?.map((item: any) => {
+        let applianceArray: any = [];
+
+        for (let i = 0; i < allApplainces?.length; i++) {
+            if (allApplainces[i]?.leadId === item?.id) {
+                applianceArray.push(allApplainces[i]);
+            }
+        }
+        const flat: any = {};
+        let flatStatusChangeReason: any = {};
+
+        applianceArray.forEach((appl: any, idx: number) => {
+            const i = idx + 1;
+            flat[`name_${i}`] = appl.name?.toUpperCase();
+            flat[`make_${i}`] = appl.makeOfAppliance?.toUpperCase();
+            flat[`age_${i}`] = appl.age;
+        });
+
+        // item?.StatusChangeReason.forEach((statusChange: any, idx: number) => {
+        //     const i = idx + 1;
+        //     flatStatusChangeReason[`from_${i}`] =
+        //         statusChange?.fromStatus?.toUpperCase();
+        //     flatStatusChangeReason[`to_${i}`] =
+        //         statusChange?.toStatus?.toUpperCase();
+        //     flatStatusChangeReason[`reason_${i}`] =
+        //         statusChange?.reason?.toUpperCase();
+        // });
+
+        const latestStatus =
+            item?.StatusChangeReason?.length > 0
+                ? item.StatusChangeReason[item.StatusChangeReason.length - 1]
+                : null;
+
+        flatStatusChangeReason = {
+            from: latestStatus?.fromStatus?.toUpperCase() || "",
+            to: latestStatus?.toStatus?.toUpperCase() || "",
+            reason: latestStatus?.reason?.toUpperCase() || "",
+        };
+        return {
+            status: item?.status?.name?.toUpperCase(),
+            saleDate: item?.saleDate?.substring(0, 10),
+            leadBy: item?.leadBy?.alias?.toUpperCase(),
+            closer: item?.closer?.alias?.toUpperCase(),
+            centre: item?.centre?.toUpperCase(),
+            // PERSONAL
+            title: item?.title?.toUpperCase()?.split(".").join(""),
+            firstName: item?.firstName?.toUpperCase(),
+            middleName: item?.middleName?.toUpperCase(),
+            lastName: item?.lastName?.toUpperCase(),
+            address: item?.address,
+            city: item?.city?.toUpperCase(),
+            county: item?.county?.toUpperCase(),
+            post: item?.pincode,
+            dateOfBirth: item?.dateOfBirth?.substring(0, 10),
+            password: item?.password,
+            phone: item?.phone?.toString(),
+            // PROCESS / PLAN
+            process: item?.process?.name?.toUpperCase(),
+            plan: item?.plan?.name?.toUpperCase(),
+            // BANK
+            paymentMethod: item?.paymentMethod?.toUpperCase(),
+            bankName: item?.bankName?.toUpperCase(),
+            accountName: item?.accountName?.toUpperCase(),
+            accountNumber: item?.accountNumber?.split(" ").join(""),
+            sort: item?.sort?.split(" ").join(""),
+            // CARD
+            cardName: item?.cardName?.toUpperCase(),
+            cardBankName: item?.cardBankName?.toUpperCase(),
+            cardNumber: item?.cardNumber,
+            cardCvv: item?.cardCvv,
+            expiry: item?.expiry,
+            comment: item?.comment?.replace(/[\r\n]+/g, " "),
+            // APPLIANCES
+            appliances: flat,
+            appliancesLength: applianceArray?.length,
+            statusChange: flatStatusChangeReason,
+        };
+    });
+
+    // console.log(newLeads);
+
+    const maxAppliances =
+        newLeads && newLeads.length > 0
+            ? Math.max(
+                  ...newLeads.map((lead: any) => lead.appliancesLength || 0)
+              )
+            : 0;
 
     const headers = [
         { label: "STATUS", key: "status" },
@@ -184,11 +259,90 @@ const Leads = () => {
         // CARD
         { label: "NAME ON CARD", key: "cardName" },
         { label: "CARD NUMBER", key: "cardNumber" },
+        { label: "CARD BANK NAME", key: "cardBankName" },
         { label: "CARD EXPIRY", key: "expiry" },
         { label: "CARD CVV", key: "cardCvv" },
         //
         { label: "COMMENT", key: "comment" },
     ];
+
+    // const excelLeadsData = newLeads?.map((item: any) => ({
+    //     status: item?.status?.name?.toUpperCase(),
+    //     saleDate: item?.saleDate?.substring(0, 10),
+    //     leadBy: item?.leadBy?.alias?.toUpperCase(),
+    //     closer: item?.closer?.alias?.toUpperCase(),
+    //     centre: item?.centre?.toUpperCase(),
+    //     // PERSONAL
+    //     title: item?.title?.toUpperCase(),
+    //     firstName: item?.firstName?.toUpperCase(),
+    //     middleName: item?.middleName?.toUpperCase(),
+    //     lastName: item?.lastName?.toUpperCase(),
+    //     address: item?.address,
+    //     city: item?.city?.toUpperCase(),
+    //     county: item?.county?.toUpperCase(),
+    //     post: item?.pincode,
+    //     dateOfBirth: item?.dateOfBirth?.substring(0, 10),
+    //     password: item?.password,
+    //     phone: item?.phone?.toString(),
+    //     // PROCESS / PLAN
+    //     process: item?.process?.name?.toUpperCase(),
+    //     plan: item?.plan?.name?.toUpperCase(),
+    //     // BANK
+    //     paymentMethod: item?.paymentMethod?.toUpperCase(),
+    //     bankName: item?.bankName?.toUpperCase(),
+    //     accountName: item?.accountName?.toUpperCase(),
+    //     accountNumber: item?.accountNumber?.toUpperCase(),
+    //     sort: item?.sort?.toUpperCase(),
+    //     // CARD
+    //     cardName: item?.cardName?.toUpperCase(),
+    //     cardBankName: item?.cardBankName?.toUpperCase(),
+    //     cardNumber: item?.cardNumber,
+    //     cardCvv: item?.cardCvv,
+    //     expiry: item?.expiry,
+    //     comment: item?.comment,
+    // }));
+
+    const applianceHeaders = [];
+    for (let i = 0; i < maxAppliances; i++) {
+        applianceHeaders.push(
+            {
+                label: `APPLIANCE NAME ${i + 1}`,
+                key: `appliances.name_${i + 1}`,
+            },
+            {
+                label: `APPLIANCE MAKE ${i + 1}`,
+                key: `appliances.make_${i + 1}`,
+            },
+            { label: `APPLIANCE AGE ${i + 1}`, key: `appliances.age_${i + 1}` }
+        );
+    }
+
+    const statusChangeReasonHeaders = [];
+
+    for (let i = 0; i < maxStatusChanges; i++) {
+        statusChangeReasonHeaders.push(
+            {
+                label: `FROM STATUS ${i + 1}`,
+                key: `statusChange.from_${i + 1}`,
+            },
+            {
+                label: `TO STATUS ${i + 1}`,
+                key: `statusChange.to_${i + 1}`,
+            },
+            { label: `REASON ${i + 1}`, key: `statusChange.reason_${i + 1}` }
+        );
+    }
+    const statusChangeReasonHeaders_v2 = [
+        { label: "FROM STATUS", key: "statusChange.from" },
+        { label: "TO STATUS", key: "statusChange.to" },
+        { label: "REASON", key: "statusChange.reason" },
+    ];
+    const newHeaders = [
+        ...headers,
+        ...statusChangeReasonHeaders_v2,
+        ...applianceHeaders,
+    ];
+    // console.log(newHeaders);
 
     const resetFilters = () => {
         setPhone("");
@@ -202,6 +356,7 @@ const Leads = () => {
         setToDate("");
         refetch();
     };
+    console.log(statusData);
 
     return (
         <>
@@ -366,6 +521,23 @@ const Leads = () => {
                                     onChange={(e) => setToDate(e.target.value)}
                                     className="border border-gray-400 px-3 py-1 rounded-md outline-none"
                                 />
+                            </div>{" "}
+                            <div className="flex flex-col space-y-1">
+                                <label htmlFor="limit">Limit Per Page</label>
+                                <select
+                                    name="limit"
+                                    onChange={(e: any) =>
+                                        setLimit(e?.target?.value)
+                                    }
+                                    id="limit"
+                                    className="border outline-none border-gray-400 px-3 py-1 rounded-md"
+                                >
+                                    {limitArray?.map((item: any) => (
+                                        <option key={item} value={item}>
+                                            {item}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <div className="mb-10 mt-3 flex items-center gap-2 text-sm">
@@ -420,13 +592,17 @@ const Leads = () => {
                                         }}
                                         className={`${
                                             item?.name.toLowerCase() ===
-                                            "success"
-                                                ? "bg-green-500"
+                                            "callbacks"
+                                                ? "bg-indigo-500"
+                                                : ""
+                                        } ${
+                                            item?.name.toLowerCase() === "leads"
+                                                ? "bg-orange-500"
                                                 : ""
                                         } ${
                                             item?.name.toLowerCase() ===
-                                            "callbacks"
-                                                ? "bg-emerald-800"
+                                            "success"
+                                                ? "bg-green-500"
                                                 : ""
                                         } ${
                                             item?.name.toLowerCase() ===
@@ -451,8 +627,8 @@ const Leads = () => {
                             </div>
 
                             <CSVLink
-                                headers={headers}
-                                data={excelLeadsData ? excelLeadsData : []}
+                                headers={newHeaders}
+                                data={newLeads ? newLeads : []}
                                 filename="Leads.csv"
                             >
                                 <button className="py-1.5 px-7 bg-green-700 text-white rounded-md text-sm flex gap-1 items-center cursor-pointer">
@@ -549,14 +725,15 @@ const Leads = () => {
                                                 scope="col"
                                                 className="px-6 py-3"
                                             >
-                                                Name
+                                                Phone
                                             </th>
                                             <th
                                                 scope="col"
                                                 className="px-6 py-3"
                                             >
-                                                Phone
+                                                Name
                                             </th>
+
                                             <th
                                                 scope="col"
                                                 className="px-6 py-3"
@@ -576,13 +753,13 @@ const Leads = () => {
                                         {leads?.map((item: any, i: number) => (
                                             <tr
                                                 key={item?.id}
-                                                className={` capitalize text-center border-b :border-gray-700 border-gray-200`}
+                                                className={`text-slate-800 font-semibold capitalize text-center border-b :border-gray-700 border-gray-200`}
                                             >
                                                 <th
                                                     scope="row"
                                                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap :text-white"
                                                 >
-                                                    {i + 1}
+                                                    {(page - 1) * limit + i + 1}
                                                 </th>
                                                 <td className="px-6 py-4 flex flex-col gap-1 items-center">
                                                     <button
@@ -612,23 +789,30 @@ const Leads = () => {
                                                     >
                                                         <FaEye />
                                                     </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            setId(item?.id);
-                                                            setShow({
-                                                                edit: false,
-                                                                delete: true,
-                                                                view: false,
-                                                            });
-                                                        }}
-                                                        className="font-medium text-white bg-red-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1 cursor-pointer"
-                                                    >
-                                                        <MdDelete />
-                                                    </button>
+                                                    {can("delete:leads") && (
+                                                        <button
+                                                            onClick={() => {
+                                                                setId(item?.id);
+                                                                setShow({
+                                                                    edit: false,
+                                                                    delete: true,
+                                                                    view: false,
+                                                                });
+                                                            }}
+                                                            className="font-medium text-white bg-red-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1 cursor-pointer"
+                                                        >
+                                                            <MdDelete />
+                                                        </button>
+                                                    )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <p
                                                         className={`${
+                                                            item?.status?.name?.toLowerCase() ===
+                                                            "leads"
+                                                                ? "bg-orange-500"
+                                                                : ""
+                                                        }${
                                                             item?.status?.name?.toLowerCase() ===
                                                             "success"
                                                                 ? "bg-green-500"
@@ -667,14 +851,14 @@ const Leads = () => {
                                                 <td className="px-6 py-4 uppercase">
                                                     {item?.verifier?.alias}
                                                 </td>
+                                                <td className="px-6 py-4">
+                                                    {item?.phone}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowra uppercase">
                                                     {item?.title}{" "}
                                                     {item?.firstName}{" "}
                                                     {item?.middleName}{" "}
                                                     {item?.lastName}
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    {item?.phone}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap uppercase">
                                                     {item?.process?.name}
@@ -704,7 +888,7 @@ const Leads = () => {
                                 Prev
                             </button>
 
-                            {pagesArray?.map((p) => (
+                            {/* {pagesArray?.map((p) => (
                                 <button
                                     key={p}
                                     onClick={() => setPage(p)}
@@ -716,7 +900,61 @@ const Leads = () => {
                                 >
                                     {p}
                                 </button>
-                            ))}
+                            ))} */}
+                            {/* Pages */}
+                            {(() => {
+                                const totalPages = data?.totalPages || 0;
+                                const maxVisible = 5; // number of pages to show around the current page
+                                let pages: (number | string)[] = [];
+
+                                if (totalPages <= 7) {
+                                    // If few pages, show all
+                                    pages = Array.from(
+                                        { length: totalPages },
+                                        (_, i) => i + 1
+                                    );
+                                } else {
+                                    // Always show first + last page
+                                    pages.push(1);
+
+                                    if (page > maxVisible) pages.push("...");
+
+                                    const start = Math.max(2, page - 2);
+                                    const end = Math.min(
+                                        totalPages - 1,
+                                        page + 2
+                                    );
+
+                                    for (let i = start; i <= end; i++) {
+                                        pages.push(i);
+                                    }
+
+                                    if (page < totalPages - (maxVisible - 1))
+                                        pages.push("...");
+
+                                    pages.push(totalPages);
+                                }
+
+                                return pages.map((p, idx) =>
+                                    p === "..." ? (
+                                        <span key={idx} className="px-3 py-1">
+                                            ...
+                                        </span>
+                                    ) : (
+                                        <button
+                                            key={p}
+                                            onClick={() => setPage(p as number)}
+                                            className={`text-xs font-semibold px-6 py-1 rounded-md capitalize cursor-pointer ${
+                                                p === page
+                                                    ? "bg-sky-500 text-white"
+                                                    : "bg-white text-black border border-slate-400"
+                                            }`}
+                                        >
+                                            {p}
+                                        </button>
+                                    )
+                                );
+                            })()}
 
                             <button
                                 disabled={page === data?.totalPages}

@@ -6,8 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllUser } from "../../../api/user";
 import { CSVLink } from "react-csv";
 import UserInfoModal from "../../components/Modal/UserInfoModal/UserInfoModal";
+import { usePermission } from "../../hooks/usePermission";
+import { MdAdd, MdEdit } from "react-icons/md";
+import CreateUserModal from "../../../components/Modal/CreateUserModal";
+import EditUserModal from "../../components/Modal/EditUserModal";
 
 const Users = () => {
+    const { can } = usePermission();
+    const [detail, setDetail] = useState(null);
     const [show, setShow] = useState({
         create: false,
         view: false,
@@ -31,11 +37,6 @@ const Users = () => {
         { label: "PHONE", key: "phone" },
         { label: "ROLE", key: "role" },
     ];
-
-    // const resetFilters = () => {
-    //     setName("");
-    //     refetch();
-    // };
 
     return (
         <>
@@ -78,6 +79,21 @@ const Users = () => {
                             <p className="text-3xl font-semibold uppercase origin-center w-fit">
                                 My Workspsaces - All Users
                             </p>
+                            {can("create:users") && (
+                                <button
+                                    onClick={() =>
+                                        setShow({
+                                            create: true,
+                                            view: false,
+                                            edit: false,
+                                            delete: false,
+                                        })
+                                    }
+                                    className="py-1.5 px-7 cursor-pointer bg-blue-700 text-white rounded-md text-sm flex gap-1 items-center"
+                                >
+                                    <MdAdd className="text-xl" /> Add User
+                                </button>
+                            )}
                         </motion.div>
                     </div>
 
@@ -173,7 +189,23 @@ const Users = () => {
                                         >
                                             {i + 1}
                                         </th>
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 space-y-0.5">
+                                            {can("edit:users") && (
+                                                <button
+                                                    onClick={() => {
+                                                        setDetail(item);
+                                                        setShow({
+                                                            create: false,
+                                                            edit: true,
+                                                            view: false,
+                                                            delete: false,
+                                                        });
+                                                    }}
+                                                    className="cursor-pointer font-medium text-white bg-green-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
+                                                >
+                                                    <MdEdit />
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => {
                                                     setId(item.id);
@@ -184,10 +216,24 @@ const Users = () => {
                                                         delete: false,
                                                     });
                                                 }}
-                                                className="font-medium cursor-pointer text-white bg-blue-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
+                                                className="cursor-pointer font-medium text-white bg-blue-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
                                             >
-                                                <FaEye /> Details
+                                                <FaEye />
                                             </button>
+                                            {/* <button
+                                                onClick={() => {
+                                                    setId(item.id);
+                                                    setShow({
+                                                        create: false,
+                                                        edit: false,
+                                                        view: false,
+                                                        delete: true,
+                                                    });
+                                                }}
+                                                className="cursor-pointer font-medium text-white bg-red-500 rounded-md w-fit px-2 py-1 text-sm flex items-center gap-1"
+                                            >
+                                                <MdDelete />
+                                            </button> */}
                                         </td>
                                         <td className="px-6 py-4">
                                             {item?.name}
@@ -237,6 +283,32 @@ const Users = () => {
                         })
                     }
                     userId={id!}
+                />
+            )}
+
+            {show.edit && (
+                <EditUserModal
+                    handleClose={() =>
+                        setShow({
+                            create: false,
+                            view: false,
+                            edit: false,
+                            delete: false,
+                        })
+                    }
+                    detail={detail}
+                />
+            )}
+            {show.create && (
+                <CreateUserModal
+                    handleClose={() =>
+                        setShow({
+                            create: false,
+                            view: false,
+                            edit: false,
+                            delete: false,
+                        })
+                    }
                 />
             )}
         </>
