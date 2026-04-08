@@ -85,7 +85,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
         "view:monthly_attendance",
         "view:teams",
     ],
-    accountant: ["view:all_attendance", "view:users"],
+    accountant: ["view:all_attendance", "view:users", "view:monthly_attendance", "view:closers"],
     audit: ["view:leads"],
 };
 
