@@ -5,6 +5,7 @@ type Action = "create" | "view" | "edit" | "delete";
 type Resource =
     | "main_dashboard"
     | "leads"
+    | "b2b_leads"
     | "old_leads"
     | "old_leadforms"
     | "users"

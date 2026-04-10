@@ -41,11 +41,18 @@ export const router = createBrowserRouter([
                 },
             },
             {
+                path: "add-b2b-lead",
+                async lazy() {
+                    let AddB2BLeads = await import(
+                        "../pages/AddB2BLeads/AddB2BLeads"
+                    );
+                    return { Component: AddB2BLeads.default };
+                },
+            },
+            {
                 path: "leads",
                 async lazy() {
-                    let UserLeads = await import(
-                        "../pages/Leads/Leads"
-                    );
+                    let UserLeads = await import("../pages/Leads/Leads");
                     return { Component: UserLeads.default };
                 },
             },

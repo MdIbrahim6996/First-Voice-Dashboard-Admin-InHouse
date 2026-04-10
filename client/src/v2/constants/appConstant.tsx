@@ -10,6 +10,7 @@ import type { Role, Permission } from "../types/auth.types";
 
 export const PUSHER_SECRET = "3598d69c8453a73ad670";
 export const PUSHER_CLUSTER = "ap2";
+export const COMPANY_HOUSE_API_KEY = import.meta.env.VITE_COMPANY_HOUSE_API_KEY;
 
 export const limitArray = [30, 50, 100, 500, 1000, 5000, 10000];
 
@@ -58,6 +59,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
     admin: [
         "view:main_dashboard",
         "view:leads",
+        "delete:leads",
         "create:leads",
         "edit:leads",
         "view:old_leads",
@@ -71,6 +73,11 @@ export const rolePermissions: Record<Role, Permission[]> = {
         "create:leads",
         "edit:leads",
         "delete:leads",
+
+        "view:b2b_leads",
+        "create:b2b_leads",
+        "edit:b2b_leads",
+        "delete:b2b_leads",
         "view:old_leads",
         "view:old_leadforms",
         "view:closers",
@@ -85,7 +92,12 @@ export const rolePermissions: Record<Role, Permission[]> = {
         "view:monthly_attendance",
         "view:teams",
     ],
-    accountant: ["view:all_attendance", "view:users", "view:monthly_attendance", "view:closers"],
+    accountant: [
+        "view:all_attendance",
+        "view:users",
+        "view:monthly_attendance",
+        "view:closers",
+    ],
     audit: ["view:leads"],
 };
 
@@ -102,6 +114,13 @@ export const sidebarItems = [
         title: "Add Lead",
         permission: "create:leads" as Permission,
         link: "/v2/add-lead",
+        icon: <RiFileAddFill className="text-xl" />,
+    },
+    {
+        id: 15,
+        title: "Add B2B Lead",
+        permission: "create:b2b_leads" as Permission,
+        link: "/v2/add-b2b-lead",
         icon: <RiFileAddFill className="text-xl" />,
     },
     {

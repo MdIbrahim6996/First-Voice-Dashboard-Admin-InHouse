@@ -90,3 +90,36 @@ export type UpdateLeadsFormInput = {
     sort: string;
     comment: string;
 };
+
+export type B2BLeadFormInput = {
+    // Customer Info
+    title: string;
+    firstName: string;
+    middleName: string;
+    lastName: string;
+    dateOfBirth: string;
+    phone: string;
+    positionInBusiness: string;
+    residentialAddress: string;
+    // Business Info
+    businessName: string;
+    tradingName: string;
+    businessNature: string;
+    companyNumber: string;
+    tradingSince: string;
+    businessType: string;
+    businessAddress: string;
+    // Loan Info
+    proposedLoanAmount: number;
+    loanType: "MCA" | "DIRECT";
+    POSAvailable: boolean;
+    monthlySalePOS: number;
+    pastLoan: {
+        value: string;
+        repaymentComplete: {
+            value: string;
+            repaymentAmount: number;
+        };
+    };
+    verifier: string;
+};
