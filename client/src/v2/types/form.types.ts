@@ -122,4 +122,5 @@ export type B2BLeadFormInput = {
         };
     };
     verifier: string;
+    comment: string;
 };

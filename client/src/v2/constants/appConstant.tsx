@@ -98,7 +98,7 @@ export const rolePermissions: Record<Role, Permission[]> = {
         "view:monthly_attendance",
         "view:closers",
     ],
-    audit: ["view:leads"],
+    audit: ["view:main_dashboard"],
 };
 
 export const sidebarItems = [

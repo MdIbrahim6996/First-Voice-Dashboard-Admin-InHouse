@@ -10,6 +10,7 @@ import { errorHandler, notFound } from "./middlewares/errorMiddleware";
 
 const app = express();
 
+
 app.use(
     cors({
         origin: [

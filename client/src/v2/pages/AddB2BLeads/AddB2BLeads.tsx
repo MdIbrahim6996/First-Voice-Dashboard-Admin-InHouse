@@ -5,9 +5,11 @@ import toast from "react-hot-toast";
 
 import type { B2BLeadFormInput } from "../../types/form.types";
 import { useEffect, useState } from "react";
-import { createLead } from "../../../api/lead";
 import { axiosInstanceV2 } from "../../lib/axiosInstance";
 import { getAllUser } from "../../../api/user";
+import { createB2BLead } from "../../../api/b2bLead";
+
+// mongodb://ibrahim:78622786aA@ac-oz9hcgh-shard-00-00.jzirle8.mongodb.net:27017,ac-oz9hcgh-shard-00-01.jzirle8.mongodb.net:27017,ac-oz9hcgh-shard-00-02.jzirle8.mongodb.net:27017/Test?ssl=true&replicaSet=atlas-prvqty-shard-0&authSource=admin&appName=Lead-Gen
 
 const AddB2BLeads = () => {
     const date = new Date();
@@ -30,11 +32,13 @@ const AddB2BLeads = () => {
     });
 
     const closerVerifierUser = user?.filter(
-        (item: any) => item?.role === "closer" || item?.role === "verifier"
+        (item: any) =>
+            (item?.role === "closer" || item?.role === "verifier") &&
+            !item?.isBlocked
     );
 
     const { mutate: createLeadMutation, isPending } = useMutation({
-        mutationFn: (formData) => createLead(formData),
+        mutationFn: (formData) => createB2BLead(formData),
         onSuccess: (data) => {
             if (data?.id) {
                 toast.success("Lead Created Successfully!");
@@ -138,13 +142,10 @@ const AddB2BLeads = () => {
                                     htmlFor="title"
                                     className="font-semibold"
                                 >
-                                    Title{" "}
-                                    <span className="text-red-500">*</span>
+                                    Title
                                 </label>
                                 <select
-                                    {...register("title", {
-                                        required: "Please select Title.",
-                                    })}
+                                    {...register("title")}
                                     id="title"
                                     defaultValue="1"
                                     className="border outline-none border-gray-400 px-3 py-1 rounded"
@@ -154,34 +155,21 @@ const AddB2BLeads = () => {
                                     <option value="Miss">Miss</option>
                                     <option value="Ms">Ms</option>
                                 </select>
-                                {errors?.title && (
-                                    <p className="text-red-500">
-                                        {errors?.title?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
                                     htmlFor="firstName"
                                     className="font-semibold"
                                 >
-                                    First Name{" "}
-                                    <span className="text-red-500">*</span>
+                                    First Name
                                 </label>
                                 <input
                                     type="text"
-                                    {...register("firstName", {
-                                        required: "Please Enter First Name.",
-                                    })}
+                                    {...register("firstName")}
                                     id="firstName"
                                     placeholder="First Name"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.firstName && (
-                                    <p className="text-red-500">
-                                        {errors?.firstName?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
@@ -203,23 +191,15 @@ const AddB2BLeads = () => {
                                     htmlFor="lastName"
                                     className="font-semibold"
                                 >
-                                    Last Name{" "}
-                                    <span className="text-red-500">*</span>
+                                    Last Name
                                 </label>
                                 <input
                                     type="text"
-                                    {...register("lastName", {
-                                        required: "Please Enter Last Name.",
-                                    })}
+                                    {...register("lastName")}
                                     id="lastName"
                                     placeholder="Last Name"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.lastName && (
-                                    <p className="text-red-500">
-                                        {errors?.lastName?.message}
-                                    </p>
-                                )}
                             </div>
                         </div>
 
@@ -240,47 +220,31 @@ const AddB2BLeads = () => {
                                     htmlFor="phoneNumber"
                                     className="font-semibold"
                                 >
-                                    Phone Number{" "}
-                                    <span className="text-red-500">*</span>
+                                    Phone Number
                                 </label>
                                 <input
                                     type="tel"
                                     maxLength={10}
-                                    {...register("phone", {
-                                        required: "Please Enter Phone Number.",
-                                    })}
+                                    {...register("phone")}
                                     id="phone"
                                     placeholder="(033) 2347 9645"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.phone && (
-                                    <p className="text-red-500">
-                                        {errors?.phone?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
                                     htmlFor="pinCode"
                                     className="font-semibold"
                                 >
-                                    Position in Business{" "}
-                                    <span className="text-red-500">*</span>
+                                    Position in Business
                                 </label>
                                 <input
                                     type="text"
-                                    {...register("positionInBusiness", {
-                                        required: "Please Enter Pincode.",
-                                    })}
+                                    {...register("positionInBusiness")}
                                     id="pinCode"
                                     placeholder="700001"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.positionInBusiness && (
-                                    <p className="text-red-500">
-                                        {errors?.positionInBusiness?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm col-span-3">
                                 <label
@@ -314,9 +278,7 @@ const AddB2BLeads = () => {
                                     <span className="text-red-500">*</span>
                                 </label>
                                 <input
-                                    {...register("businessName", {
-                                        required: "Please Enter Phone Number.",
-                                    })}
+                                    {...register("businessName")}
                                     id="businessName"
                                     placeholder="Business Name"
                                     onChange={(e) => setQuery(e.target.value)}
@@ -396,22 +358,14 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Trading Name
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
-                                    {...register("tradingName", {
-                                        required: "Please Enter Pincode.",
-                                    })}
+                                    {...register("tradingName")}
                                     id="pinCode"
                                     placeholder="700001"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.tradingName && (
-                                    <p className="text-red-500">
-                                        {errors?.tradingName?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
@@ -419,23 +373,15 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Business Nature
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="tel"
                                     maxLength={10}
-                                    {...register("businessNature", {
-                                        required: "Please Enter Phone Number.",
-                                    })}
+                                    {...register("businessNature")}
                                     id="businessNature"
                                     placeholder="(033) 2347 9645"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.businessNature && (
-                                    <p className="text-red-500">
-                                        {errors?.businessNature?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
@@ -443,23 +389,15 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Company No.
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="tel"
                                     maxLength={10}
-                                    {...register("companyNumber", {
-                                        required: "Please Enter Phone Number.",
-                                    })}
+                                    {...register("companyNumber")}
                                     id="companyNumber"
                                     placeholder="(033) 2347 9645"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.companyNumber && (
-                                    <p className="text-red-500">
-                                        {errors?.companyNumber?.message}
-                                    </p>
-                                )}
                             </div>
 
                             <div className="flex flex-col text-sm space-y-0.5">
@@ -468,22 +406,14 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Trading Since
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="date"
-                                    {...register("tradingSince", {
-                                        required: "Please Enter Pincode.",
-                                    })}
+                                    {...register("tradingSince")}
                                     id="pinCode"
                                     placeholder="700001"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.tradingSince && (
-                                    <p className="text-red-500">
-                                        {errors?.tradingSince?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
@@ -491,23 +421,15 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Business Type
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="tel"
                                     maxLength={10}
-                                    {...register("businessType", {
-                                        required: "Please Enter Phone Number.",
-                                    })}
+                                    {...register("businessType")}
                                     id="businessType"
                                     placeholder="(033) 2347 9645"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.businessType && (
-                                    <p className="text-red-500">
-                                        {errors?.businessType?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm col-span-3">
                                 <label
@@ -530,29 +452,21 @@ const AddB2BLeads = () => {
                             Loan Details
                         </p>
 
-                        <div className="grid grid-cols-3 gap-x-4 gap-y-5 my-5">
+                        <div className="grid grid-cols-4 gap-x-4 gap-y-5 my-5">
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
                                     htmlFor="proposedLoanAmount"
                                     className="font-semibold"
                                 >
                                     Proposed Loan Amount
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="number"
-                                    {...register("proposedLoanAmount", {
-                                        required: "Please Enter Number.",
-                                    })}
+                                    {...register("proposedLoanAmount")}
                                     id="proposedLoanAmount"
                                     placeholder="£ 1,234,567"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.proposedLoanAmount && (
-                                    <p className="text-red-500">
-                                        {errors?.proposedLoanAmount?.message}
-                                    </p>
-                                )}
                             </div>
 
                             <div className="flex flex-col text-sm space-y-0.5">
@@ -561,16 +475,13 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Loan Type
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <div className="flex mt-3">
                                     <label className="flex cursor-pointer w-full items-center gap-1">
                                         <input
                                             type="radio"
                                             value="MCA"
-                                            {...register("loanType", {
-                                                required: "Select status",
-                                            })}
+                                            {...register("loanType")}
                                         />
                                         MCA
                                     </label>
@@ -583,11 +494,6 @@ const AddB2BLeads = () => {
                                         DIRECT
                                     </label>
                                 </div>
-                                {errors?.loanType && (
-                                    <p className="text-red-500">
-                                        {errors?.loanType?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
@@ -595,16 +501,13 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     POS Available
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <div className="flex mt-3">
                                     <label className="flex cursor-pointer w-full items-center gap-1">
                                         <input
                                             type="radio"
                                             value={1}
-                                            {...register("POSAvailable", {
-                                                required: "Select status",
-                                            })}
+                                            {...register("POSAvailable")}
                                         />
                                         YES
                                     </label>
@@ -619,11 +522,6 @@ const AddB2BLeads = () => {
                                         </label>
                                     )}
                                 </div>
-                                {errors?.loanType && (
-                                    <p className="text-red-500">
-                                        {errors?.loanType?.message}
-                                    </p>
-                                )}
                             </div>
 
                             <div className="flex flex-col text-sm space-y-0.5">
@@ -632,22 +530,14 @@ const AddB2BLeads = () => {
                                     className="font-semibold"
                                 >
                                     Monthly Sale on POS
-                                    <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="number"
-                                    {...register("monthlySalePOS", {
-                                        required: "Please Enter Number.",
-                                    })}
+                                    {...register("monthlySalePOS")}
                                     id="proposedLoanAmount"
                                     placeholder="£ 4,796,459"
                                     className="border border-gray-400 px-3 py-1 rounded outline-none"
                                 />
-                                {errors?.monthlySalePOS && (
-                                    <p className="text-red-500">
-                                        {errors?.monthlySalePOS?.message}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col text-sm space-y-0.5">
                                 <label
@@ -879,7 +769,7 @@ const AddB2BLeads = () => {
                         </div>
                     </div>
 
-                    {/* <div className="mb-4">
+                    <div className="mb-4">
                         <div className="flex flex-col text-sm space-y-0.5">
                             <label htmlFor="comments" className="font-semibold">
                                 Comments
@@ -892,7 +782,7 @@ const AddB2BLeads = () => {
                                 className="border border-gray-400 px-3 py-1 rounded outline-none"
                             />
                         </div>
-                    </div> */}
+                    </div>
                     <div>
                         <button
                             disabled={isPending}

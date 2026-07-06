@@ -241,6 +241,55 @@ model Target {
   @@map("target")
 }
 
+
+
+
+enum LoanType {
+  MCA
+  DIRECT
+}
+
+model B2BLead {
+  id                    String   @id @default(uuid())
+
+  // Customer Info
+  title                 String
+  firstName             String
+  middleName            String?
+  lastName              String
+  dateOfBirth           DateTime
+  phone                 String
+  positionInBusiness    String
+  residentialAddress    String
+
+  // Business Info
+  businessName          String
+  tradingName           String?
+  businessNature        String
+  companyNumber         String
+  tradingSince          DateTime
+  businessType          String
+  businessAddress       String
+
+  // Loan Info
+  proposedLoanAmount    Float
+  loanType              LoanType
+  POSAvailable          Boolean
+  monthlySalePOS        Float?
+
+  verifier              String
+
+  // Relations
+  pastLoan              Boolean
+  repaymentComplete     Boolean
+  repaymentAmount       Float
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+
+
 model old_users {
   id                BigInt      @id @default(autoincrement()) @db.UnsignedBigInt
   employee_id       String?
